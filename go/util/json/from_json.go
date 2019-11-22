@@ -87,10 +87,12 @@ func FromJSON(r io.Reader, vrw types.ValueReadWriter, opts FromOptions) (types.V
 	// rather than going through a pile of Go interfaces.
 	var pile interface{}
 	err := dec.Decode(&pile)
-	if err != nil {
-		return nil, err
+
+	if !dec.More() && err == nil {
+		return NomsValueFromDecodedJSON(vrw, pile, opts.Structs), nil
 	}
-	return NomsValueFromDecodedJSON(vrw, pile, opts.Structs), nil
+
+	return nil, err
 }
 
 // FromOptions controls how FromJSON works.
